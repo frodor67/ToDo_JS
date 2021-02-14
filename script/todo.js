@@ -5,26 +5,24 @@ const todoControl = document.querySelector('.todo-control'),
       todoList = document.querySelector('.todo-list'),
       todoCompleted = document.querySelector('.todo-completed');
 
-let todoData = [];
+let todoData = [],
+    todoJson, todoJsonParse;
 
-document.addEventListener('DOMContentLoaded', function () {
- if (!localStorage) {
-  todoData = JSON.parse(localStorage.getItem('todoData'));
-  console.log(localStorage);
- }console.log(localStorage);
-}); 
+
+
+// function () {
+//  if (!localStorage) {
+//   todoData = JSON.parse(localStorage.getItem('todoData'));
+//   console.log(localStorage);
+//  }console.log(localStorage);
+// }); 
 
 
 
 const render = function () { 
 
- if (todoData !== null) {  
-  localStorage.setItem(todoData, JSON.stringify(todoData));
- }
  todoList.textContent = '';
- todoCompleted.textContent = '';
-
-
+ todoCompleted.textContent = ''; 
  
  todoData.forEach(function(item) {
   
@@ -43,11 +41,11 @@ const render = function () {
     headerInput.value = '';
    }
   
-
   const btnTodoComleted = li.querySelector('.todo-complete');
 
   btnTodoComleted.addEventListener('click', function () {
    item.completed = !item.completed;
+   localStorage.todoJson = JSON.stringify(todoData);
    render();
   });
 
@@ -55,17 +53,19 @@ const render = function () {
 
   btnTodoRemove.addEventListener('click', function (item) {
    todoData.splice(item, 1);
-   localStorage.removeItem(todoData.item);
+
+   let todoDataStorage = JSON.parse(localStorage.todoJson);
+
+   todoDataStorage.splice(item, 1);
+
+   localStorage.todoJson = JSON.stringify(todoDataStorage);
+
    render();
   });
   
-  });
-
-  
+  }); 
 
 };
-
-
 
 todoControl.addEventListener('submit', function(event){
  event.preventDefault();
@@ -76,12 +76,21 @@ todoControl.addEventListener('submit', function(event){
   completed: false
  };
 
- todoData.push(newTodo);
+ todoData.push(newTodo); 
+  
+ localStorage.todoJson = JSON.stringify(todoData);
  
  render();
 }
 });
 
+document.addEventListener('DOMContentLoaded', function(){
+  if (localStorage.getItem('todoJson') !== null) {
+    todoData = JSON.parse(localStorage.todoJson);
+    render();
+    console.log(todoData);
+  }
+});
 
 
 render();
