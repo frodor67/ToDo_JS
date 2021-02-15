@@ -10,14 +10,6 @@ let todoData = [],
 
 
 
-// function () {
-//  if (!localStorage) {
-//   todoData = JSON.parse(localStorage.getItem('todoData'));
-//   console.log(localStorage);
-//  }console.log(localStorage);
-// }); 
-
-
 
 const render = function () { 
 
@@ -51,7 +43,10 @@ const render = function () {
 
   const btnTodoRemove = li.querySelector('.todo-remove');
 
-  btnTodoRemove.addEventListener('click', function (item) {
+  btnTodoRemove.addEventListener('click', function () {
+    
+   item = todoData.indexOf(item);
+   
    todoData.splice(item, 1);
 
    let todoDataStorage = JSON.parse(localStorage.todoJson);
