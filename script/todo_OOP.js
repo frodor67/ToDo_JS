@@ -8,6 +8,9 @@ class Todo {
         this.todoCompleted = document.querySelector(todoCompleted);
         this.todoContainer = document.querySelector(todoContainer);
         this.todoData = new Map(JSON.parse(localStorage.getItem('todoList')));
+        this.elemAnimate;
+        this.selecItem;
+        this.count = 100;
     }
 
     addToStorage() {
@@ -29,6 +32,7 @@ class Todo {
                    <div class="todo-buttons">
                    <button class="todo-remove"></button>
                    <button class="todo-complete"></button>
+                   <button class="todo-edit"></button>
                    </div>
                   `);
         if (todo.completed) {
@@ -58,14 +62,14 @@ class Todo {
     }
 
     deleteItem(key) {
-        const _this = this;
         this.todoData.forEach(item => {
             if (key === item.key) {
-                _this.todoData.delete(item.key);
+                this.todoData.delete(item.key);
             }
             this.render();
         });
     }
+
 
     completedItem(key) {
         this.todoData.forEach(item => {
@@ -77,16 +81,85 @@ class Todo {
 
     }
 
+    editItem(key) {
+        const selecItem = this.selecItem.querySelector('.text-todo');
+        const allTodoText = this.todoContainer.querySelectorAll('li>span');
+        let value;
+
+
+
+        selecItem.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                selecItem.removeAttribute('contenteditable');
+                value = selecItem.textContent;
+                this.setTodoData(key, value);
+            }
+
+        });
+
+
+        allTodoText.forEach(item => {
+            if (item === selecItem) {
+                selecItem.setAttribute('contenteditable', true);
+                selecItem.focus();
+                value = selecItem.textContent;
+            } else if (item !== this.selecItem) {
+                item.removeAttribute('contenteditable');
+            }
+        });
+
+        selecItem.addEventListener('blur', () => {
+            selecItem.removeAttribute('contenteditable');
+            this.render();
+
+        });
+    }
+
+    setTodoData(key, value) {
+        this.todoData.forEach(elem => {
+            if (key === elem.key) {
+                elem.value = value;
+                this.render();
+            }
+        });
+
+    }
+
+    animateTodo() {
+        const elem = this.selecItem;
+
+        if (elem.matches('.todo-item')) {
+
+            this.elemAnimate = requestAnimationFrame(this.animateTodo.bind(this));
+
+
+            this.count--;
+
+            if (+this.count > 0) {
+                elem.style.opacity = +this.count + '%';
+            } else {
+                cancelAnimationFrame(this.elemAnimate);
+                this.count = 100;
+            }
+        }
+    }
+
     handler() {
         this.todoContainer.addEventListener('click', event => {
             const target = event.target;
+            this.selecItem = target.parentNode.parentNode;
             const key = target.parentNode.parentNode.key;
+            //console.log(this.selecItem);
             if (target.classList.contains('todo-complete')) {
-                this.completedItem(key);
-            } else if (target.closest('.todo-remove')) {
-                this.deleteItem(key);
+                this.animateTodo();
+                setTimeout(() => { this.completedItem(key); }, 1000, this);
+            } else if (target.classList.contains('todo-remove')) {
+                this.animateTodo();
+                setTimeout(() => { this.deleteItem(key); }, 2000, this);
+            } else if (target.classList.contains('todo-edit')) {
+                this.editItem(key);
             }
-        });
+        }, true);
     }
 
     init() {
